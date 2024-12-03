@@ -21,7 +21,7 @@ dependencies = [
 dynamic = ["version"]
 
 [project.scripts]
-positive-ai = "src.cli:main"
+positive-ai = "positive_ai.cli:main"
 
 # ... other project metadata fields as listed in:
 #     https://packaging.python.org/en/latest/guides/writing-pyproject-toml/

@@ -14,7 +14,7 @@ __pycache__/
 # packaging
 build/
 dist/
-mpl_themes_utils.egg-info/
+*.egg-info/
 
 # doc build
 sphinx/build/

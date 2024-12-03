@@ -5,8 +5,17 @@ from typing import Union
 from pptx.shapes.placeholder import *
 from pptx.slide import Slide
 
-AnyPlaceholder = Union[LayoutPlaceholder, MasterPlaceholder, NotesSlidePlaceholder, SlidePlaceholder, ChartPlaceholder,
-                       PicturePlaceholder, PlaceholderGraphicFrame, PlaceholderPicture, TablePlaceholder]
+AnyPlaceholder = Union[
+    LayoutPlaceholder,
+    MasterPlaceholder,
+    NotesSlidePlaceholder,
+    SlidePlaceholder,
+    ChartPlaceholder,
+    PicturePlaceholder,
+    PlaceholderGraphicFrame,
+    PlaceholderPicture,
+    TablePlaceholder,
+]
 
 
 class ExtendedSlide(Slide):
@@ -34,7 +43,9 @@ class ExtendedSlide(Slide):
         A cached mapping between Shape names and shape indices.
         """
         if self.__shape_name_to_index is None:
-            self.__shape_name_to_index = {s.name: index for index, s in enumerate(self.shapes)}
+            self.__shape_name_to_index = {
+                s.name: index for index, s in enumerate(self.shapes)
+            }
         return self.__shape_name_to_index
 
     def get_shape(self, shape_name) -> Union[Shape, AnyPlaceholder]:
@@ -50,7 +61,9 @@ class ExtendedSlide(Slide):
         try:
             return self.shapes[self._shape_name_to_index[shape_name]]
         except KeyError:
-            raise KeyError(f"Cannot find shape named {shape_name}. Available shapes: {list(self._shape_name_to_index.keys())}")
+            raise KeyError(
+                f"Cannot find shape named {shape_name}. Available shapes: {list(self._shape_name_to_index.keys())}"
+            )
 
     def __repr__(self) -> str:
         """
@@ -58,8 +71,11 @@ class ExtendedSlide(Slide):
         easier to understand / debug.
         """
         content = "\n".join(
-            [f"shape={s.name}, type={type(s)}, index={index}, text='{s.text if hasattr(s, 'text') else ''}'" for index, s
-             in enumerate(self.shapes)])
+            [
+                f"shape={s.name}, type={type(s)}, index={index}, text='{s.text if hasattr(s, 'text') else ''}'"
+                for index, s in enumerate(self.shapes)
+            ]
+        )
         return f"<{self.__class__.__name__}> at {hex(id(self))}\n{content}"
 
 

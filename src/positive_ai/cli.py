@@ -5,7 +5,7 @@ import os
 
 import click
 
-from constants import SRC_DIR
+from positive_ai.constants import SRC_DIR
 
 
 class CLI(click.MultiCommand):

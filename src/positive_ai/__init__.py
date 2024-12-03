@@ -3,8 +3,8 @@ from pathlib import Path
 SRC_DIR = Path(__file__).parent
 ROOT_DIR = SRC_DIR.parent
 
-__project__ = "positive-ai"
-__name__ = "positive-ai"
+__project__ = "positive_ai"
+__name__ = "positive_ai"
 __description__ = "A utility for helping member onboarding"
 __copyright__ = "Copyright © 2024 Positive AI. All rights reserved"
 __author__ = "Vallet Hugo"
