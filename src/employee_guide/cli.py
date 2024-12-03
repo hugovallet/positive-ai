@@ -45,11 +45,14 @@ def generate(member_name, member_join_month, member_gatherer_firstname, member_g
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # Summarise member info from prompt
-    import pdb; pdb.set_trace()
-    infos = MemberInfo(member_name=member_name,member_join_month=member_join_month,member_gatherer_firstname=member_gatherer_firstname,member_gatherer_lastname=member_gatherer_lastname,member_gatherer_email=member_gatherer_email)
+    infos = MemberInfo(member_name=member_name,
+                       member_join_month=member_join_month,
+                       member_gatherer_firstname=member_gatherer_firstname,
+                       member_gatherer_lastname=member_gatherer_lastname,
+                       member_gatherer_email=member_gatherer_email)
 
     # Build french deck
     fr_template_path = ROOT_DIR / "templates" / "2024_09 Positive_AI_Flyer membres-template-fr.pptx"
     french_deck = MemberOnboardingDeck(template_path=fr_template_path, infos=infos)
-    filename = f"2024_09 Positive_AI_Flyer-{infos.member_name.lower()}-fr.pptx"
+    filename = f"2024_09_Positive_AI_Flyer_{infos.member_name.lower()}_fr.pptx"
     french_deck.save(file_path=Path.cwd() / "positive-ai-generated" / "employee-onboarding" / filename)

@@ -28,8 +28,8 @@ class FirstPage(ExtendedSlide):
         self._member_info = member_info
 
     def fill(self):
-        replace_text_in_shape(self.get_shape("Date Placeholder"), self._member_info.member_join_month)
-        replace_text_in_shape(self.get_shape("Member Placeholder"), self._member_info.member_name)
+        replace_text_in_shape(self.get_shape("Text Placeholder 1"), self._member_info.member_join_month)
+        replace_text_in_shape(self.get_shape("Text Placeholder 2"), self._member_info.member_name)
 
 
 class SecondPage(ExtendedSlide):
@@ -49,13 +49,8 @@ class ThirdPage(ExtendedSlide):
         self._member_info = member_info
 
     def fill(self):
-        combined_text = f""""
-        {self._member_info.member_gatherer_firstame} {self._member_info.member_gatherer_lastname}
-        référent Positive AI
-        pour {self._member_info.member_name}
-        {self._member_info.member_gatherer_email}
-        """
-        replace_text_in_shape(self.get_shape("Gatherer Info"), combined_text)
+        combined_text = f"{self._member_info.member_gatherer_firstname} {self._member_info.member_gatherer_lastname}\nréférent Positive AI\npour {self._member_info.member_name}\n{self._member_info.member_gatherer_email}"
+        replace_text_in_shape(self.get_shape("Text Placeholder 2"), combined_text)
 
 
 class MemberOnboardingDeck:
@@ -117,7 +112,7 @@ class MemberOnboardingDeck:
 
         # if the folder doesn't exist, create it
         if not file_path.parent.exists():
-            file_path.parent.mkdir(True, True)
+            file_path.parent.mkdir(exist_ok=True, parents=True, mode=0o770)
 
         # 2 fill all the slides with numbers and images
         for s in self.slides:

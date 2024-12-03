@@ -46,7 +46,10 @@ class ExtendedSlide(Slide):
         Returns:
             shape: the Shape object
         """
-        return self.shapes[self._shape_name_to_index[shape_name]]
+        try:
+            return self.shapes[self._shape_name_to_index[shape_name]]
+        except KeyError:
+            raise KeyError(f"Cannot find shape named {shape_name}. Available shapes: {list(self._shape_name_to_index.keys())}")
 
     def __repr__(self) -> str:
         """
