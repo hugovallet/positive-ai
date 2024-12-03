@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "positive-ai"
+authors = [
+    {name = "Hugo Vallet", email = "vallet.hugo@bcg.com"},
+]
+description = "A utility for helping member onboarding"
+readme = "README.md"
+requires-python = ">=3.8"
+keywords = ["Trustworthy AI", "Responsible AI"]
+license = {text = "BSD-3-Clause"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    'email-validator', 'pydantic', 'python-pptx', 'typeguard', 'click',
+]
+dynamic = ["version"]
+
+[project.scripts]
+positive-ai = "src.cli:main"
+
+# ... other project metadata fields as listed in:
+#     https://packaging.python.org/en/latest/guides/writing-pyproject-toml/
