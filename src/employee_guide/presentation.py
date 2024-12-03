@@ -1,26 +1,21 @@
 from pathlib import Path
-import logging
-from datetime import datetime
-from pathlib import Path
 from typing import List, Optional
 
-import click
 from pptx import Presentation
 from pydantic import BaseModel, EmailStr
 
-from src import ROOT_DIR
-from utils.click import SpecialHelpOrder
-from utils.ppt import ExtendedSlide
+from src.constants import ROOT_DIR
+from utils.ppt import ExtendedSlide, replace_text_in_shape
 
 
 class MemberInfo(BaseModel):
     member_name: str
     member_join_month: str
-    member_logo_path: Optional[str]
-    member_gatherer_firstame: str
+    member_logo_path: Optional[str] = None
+    member_gatherer_firstname: str
     member_gatherer_lastname: str
     member_gatherer_email: EmailStr
-    member_gatherer_picture: Optional[str]
+    member_gatherer_photo_path: Optional[str] = None
 
 
 class FirstPage(ExtendedSlide):
@@ -70,9 +65,7 @@ class MemberOnboardingDeck:
 
     def __init__(self,
                  infos: MemberInfo,
-                 name: str,
                  template_path: Path = ROOT_DIR / 'templates' / '2024_09 Positive_AI_Flyer membres-template-fr.pptx'):
-        self._log = logging.getLogger(__name__)
         self._template_path = Presentation(str(template_path))
         self._infos = infos
 
@@ -132,70 +125,3 @@ class MemberOnboardingDeck:
 
         # save the underlying presentation object
         self._template_path.save(str(file_path))
-
-
-def replace_text_in_shape(shape, new_text: str):
-    """
-    Replace the text in the Python ppt shape maintaining all formatting.
-    """
-    if shape.has_text_frame:
-        if shape.is_placeholder:
-            shape.text = new_text
-        else:
-            text_frame = shape.text_frame
-            text_frame.paragraphs[0].runs[0].text = new_text
-    else:
-        raise TypeError("shape as no text box")
-
-
-@click.group()
-def cli():
-    """List of commands"""
-
-
-@click.command(
-    help="Generate the employee starter presentation in english and french.",
-    #help_priority=1
-)
-@click.option('--member-name',
-              help="the name of the company joining positive AI",
-              type=str,
-              prompt=True
-              )
-@click.option('--member-join-month',
-              help="the month the company joined positive AI",
-              type=str,
-              prompt=True
-              )
-@click.option('--member-gatherer-firstname',
-              help="the firstname of the company gatherer",
-              type=str,
-              prompt=True
-              )
-@click.option('--member-gatherer-lastname',
-              help="the lastname of the company gatherer",
-              type=str,
-              prompt=True
-              )
-@click.option('--member-gatherer-email',
-              help="the email address of the company gatherer",
-              type=str,
-              prompt=True
-              )
-def generate(member_name, member_join_month, member_gatherer_firstname, member_gatherer_lastname, member_gatherer_email):
-    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-
-    # Summarise member info from prompt
-    infos = MemberInfo(
-        member_name=member_name,
-        member_join_month=member_join_month,
-        member_gatherer_firstname=member_gatherer_firstname,
-        member_gatherer_lastname=member_gatherer_lastname,
-        member_gatherer_email=member_gatherer_email
-    )
-
-    # Build french deck
-    fr_template_path = ROOT_DIR / "templates" / "2024_09 Positive_AI_Flyer membres-template-fr.pptx"
-    french_deck = MemberOnboardingDeck(template_path=fr_template_path)
-    filename = f"2024_09 Positive_AI_Flyer-{infos.member_name.lower()}-fr.pptx"
-    french_deck.save(file_path=Path.cwd() / "positive-ai-generated" / "employee-onboarding" / filename)

@@ -2,12 +2,10 @@
 """ CLI helper """
 
 import os
-from pathlib import Path
 
 import click
 
-SRC_DIR = Path(__file__).parent
-ROOT_DIR = SRC_DIR.parent
+from constants import SRC_DIR
 
 
 class CLI(click.MultiCommand):
@@ -36,9 +34,9 @@ class CLI(click.MultiCommand):
             with open(filename) as file:
                 code = compile(file.read(), filename, "exec")
                 eval(code, commands, commands)  # pylint: disable=eval-used
-            return commands.get("cli", None)
-        except FileNotFoundError:
-            print("not found")
+            return commands["cli"]
+        except Exception as e:
+            raise e
 
 
 @click.command(cls=CLI)

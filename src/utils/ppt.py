@@ -57,3 +57,17 @@ class ExtendedSlide(Slide):
             [f"shape={s.name}, type={type(s)}, index={index}, text='{s.text if hasattr(s, 'text') else ''}'" for index, s
              in enumerate(self.shapes)])
         return f"<{self.__class__.__name__}> at {hex(id(self))}\n{content}"
+
+
+def replace_text_in_shape(shape, new_text: str):
+    """
+    Replace the text in the Python ppt shape maintaining all formatting.
+    """
+    if shape.has_text_frame:
+        if shape.is_placeholder:
+            shape.text = new_text
+        else:
+            text_frame = shape.text_frame
+            text_frame.paragraphs[0].runs[0].text = new_text
+    else:
+        raise TypeError("shape as no text box")
