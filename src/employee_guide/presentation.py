@@ -4,7 +4,6 @@ from typing import List, Optional
 from pptx import Presentation
 from pydantic import BaseModel, EmailStr
 
-from src.constants import ROOT_DIR
 from utils.ppt import ExtendedSlide, replace_text_in_shape
 
 
@@ -17,19 +16,24 @@ class MemberInfo(BaseModel):
     member_gatherer_email: EmailStr
     member_gatherer_photo_path: Optional[str] = None
 
+    @property
+    def member_id(self) -> str:
+        return self.member_name.lower().replace(" ", "_")
+
 
 class FirstPage(ExtendedSlide):
     """
     A class defining the main page.
     """
 
-    def __init__(self, master_slide, member_info: MemberInfo):
-        super().__init__(master_slide)
+    def __init__(self, master_slide, member_info: MemberInfo, language: str):
+        super().__init__(master_slide, language=language)
         self._member_info = member_info
 
     def fill(self):
         replace_text_in_shape(self.get_shape("Text Placeholder 1"), self._member_info.member_join_month)
         replace_text_in_shape(self.get_shape("Text Placeholder 2"), self._member_info.member_name)
+        self.get_shape("Picture Placeholder 3").insert_picture(self._member_info.member_logo_path)
 
 
 class SecondPage(ExtendedSlide):
@@ -44,13 +48,19 @@ class ThirdPage(ExtendedSlide):
     A class defining the last page.
     """
 
-    def __init__(self, master_slide, member_info: MemberInfo):
-        super().__init__(master_slide)
+    def __init__(self, master_slide, member_info: MemberInfo, language: str):
+        super().__init__(master_slide, language=language)
         self._member_info = member_info
 
     def fill(self):
-        combined_text = f"{self._member_info.member_gatherer_firstname} {self._member_info.member_gatherer_lastname}\nréférent Positive AI\npour {self._member_info.member_name}\n{self._member_info.member_gatherer_email}"
+        if self._language == "fr":
+            combined_text = f"{self._member_info.member_gatherer_firstname} {self._member_info.member_gatherer_lastname}\nréférent Positive AI\npour {self._member_info.member_name}\n{self._member_info.member_gatherer_email}"
+        elif self._language == "en":
+            combined_text = f"{self._member_info.member_gatherer_firstname} {self._member_info.member_gatherer_lastname}\nPositive AI repr\nfor {self._member_info.member_name}\n{self._member_info.member_gatherer_email}"
+        else:
+            raise Exception(f"Unsupported language '{self._language}'")
         replace_text_in_shape(self.get_shape("Text Placeholder 2"), combined_text)
+        self.get_shape("Picture Placeholder 1").insert_picture(self._member_info.member_gatherer_photo_path)
 
 
 class MemberOnboardingDeck:
@@ -60,9 +70,13 @@ class MemberOnboardingDeck:
 
     def __init__(self,
                  infos: MemberInfo,
-                 template_path: Path = ROOT_DIR / 'templates' / '2024_09 Positive_AI_Flyer membres-template-fr.pptx'):
+                 language: str,
+                 template_path: Path):
         self._template_path = Presentation(str(template_path))
         self._infos = infos
+        self._language = language
+
+        assert language in ("fr", "en"), f"Unsupported language '{language}'"
 
         # cached properties
         self._slides = None
@@ -85,17 +99,17 @@ class MemberOnboardingDeck:
             # First slide
             front_layout = self.get_layout("first-page")
             master = self._template_path.slides.add_slide(front_layout)
-            slide_list.append(FirstPage(master, member_info=self._infos))
+            slide_list.append(FirstPage(master, member_info=self._infos, language=self._language))
 
             # Second slide
             disclaimer_layout = self.get_layout("second-page")
             master = self._template_path.slides.add_slide(disclaimer_layout)
-            slide_list.append(SecondPage(master_slide=master))
+            slide_list.append(SecondPage(master_slide=master, language=self._language))
 
             # Third slides
             end_layout = self.get_layout("third-page")
             master = self._template_path.slides.add_slide(end_layout)
-            slide_list.append(ThirdPage(master_slide=master, member_info=self._infos))
+            slide_list.append(ThirdPage(master_slide=master, member_info=self._infos, language=self._language))
 
             self._slides = slide_list
 

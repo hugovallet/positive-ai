@@ -14,11 +14,12 @@ class ExtendedSlide(Slide):
     A class defining the slide holding all KPI data. It extends to base Slide class of pptx.
     """
 
-    def __init__(self, master_slide: Slide):
+    def __init__(self, master_slide: Slide, language: str):
         self._log = logging.getLogger(__name__)
         super().__init__(element=master_slide.element, part=master_slide.part)
         # cached prop
         self.__shape_name_to_index = None
+        self._language = language
 
     @abc.abstractmethod
     def fill(self):
