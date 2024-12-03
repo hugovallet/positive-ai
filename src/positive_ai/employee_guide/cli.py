@@ -1,7 +1,7 @@
 from pathlib import Path
 import click
 
-from positive_ai.constants import ROOT_DIR
+from positive_ai.constants import SRC_DIR
 from positive_ai.employee_guide.presentation import MemberOnboardingDeck, MemberInfo
 
 
@@ -76,7 +76,7 @@ def generate(
 
     # Build french deck
     fr_template_path = (
-        ROOT_DIR / "templates" / "2024_09 Positive_AI_Flyer membres-template-fr.pptx"
+        SRC_DIR / "templates" / "2024_09 Positive_AI_Flyer membres-template-fr.pptx"
     )
     french_deck = MemberOnboardingDeck(
         template_path=fr_template_path, infos=infos, language="fr"
@@ -92,7 +92,7 @@ def generate(
 
     # Build english deck
     en_template_path = (
-        ROOT_DIR / "templates" / "2024_09 Positive_AI_Flyer membres-template-en.pptx"
+        SRC_DIR / "templates" / "2024_09 Positive_AI_Flyer membres-template-en.pptx"
     )
     english_deck = MemberOnboardingDeck(
         template_path=en_template_path, infos=infos, language="en"
