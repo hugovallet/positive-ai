@@ -1,6 +1,4 @@
 import click
-import pandas as pd
-from click import ParamType
 
 
 DATE_FORMAT = "%Y-%m-%d"
@@ -40,23 +38,6 @@ class SpecialHelpOrder(click.Group):
             return cmd
 
         return decorator
-
-
-class CLITimestamp(ParamType):
-    """
-    A custom caster that allows "pd.Timestamp" as a type for input CLI arguments.
-    """
-
-    name = "timestamp"
-
-    def convert(self, value, param, ctx):
-        try:
-            return pd.to_datetime(value, format=DATE_FORMAT)
-        except ValueError:
-            self.fail(f"{value} is not a valid '{DATE_FORMAT}' date", param, ctx)
-
-    def __repr__(self):
-        return "TIMESTAMP"
 
 
 def make_list_cb(ctx, param, value):

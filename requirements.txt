@@ -1,1 +1,5 @@
 click
+python-pptx
+typeguard
+pydantic
+email-validator

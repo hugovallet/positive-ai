@@ -45,7 +45,7 @@ class CLI(click.MultiCommand):
 @click.version_option(version="0.1.12")
 def main():
     """
-    Welcome to the responsible ML project! Find the executable commands bellow.
+    Welcome to Positive AI starter util! Find the executable commands bellow.
     """
 
 
