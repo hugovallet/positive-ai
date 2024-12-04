@@ -93,6 +93,7 @@ def generate_one_flyer(
     french_deck.save(
         file_path=Path.cwd()
         / "positive_ai-generated"
+        / "member-specific"
         / infos.member_id
         / "employee-onboarding"
         / filename
@@ -163,14 +164,14 @@ def generate_community_deck(config_file_path):
 
     # Build english deck
     print("[+] Generating french doc...")
-    en_template_path = (
+    fr_template_path = (
         SRC_DIR / "templates" / "Ateliers-pai-trombinoscope-template.pptx"
     )
-    english_deck = CommunityDeck(
-        template_path=en_template_path, infos=infos, language="fr"
+    fr_deck = CommunityDeck(
+        template_path=fr_template_path, infos=infos, language="fr"
     )
     filename = f"{ts}_Positive_AI_Community_Deck_fr.pptx"
-    english_deck.save(
+    fr_deck.save(
         file_path=Path.cwd()
         / "positive_ai-generated"
         / "non-member-specific"
