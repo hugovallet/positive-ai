@@ -1,28 +1,15 @@
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 
 from pptx import Presentation
-from pydantic import BaseModel, EmailStr
 
+from positive_ai.documentation.data_model import MemberInfo
 from positive_ai.utils.ppt import (
     ExtendedSlide,
     replace_text_in_shape,
     insert_image_in_shape,
+    Deck,
 )
-
-
-class MemberInfo(BaseModel):
-    member_name: str
-    member_join_month: str
-    member_logo_path: Optional[str] = None
-    member_gatherer_firstname: str
-    member_gatherer_lastname: str
-    member_gatherer_email: EmailStr
-    member_gatherer_photo_path: Optional[str] = None
-
-    @property
-    def member_id(self) -> str:
-        return self.member_name.lower().replace(" ", "_")
 
 
 class FirstPage(ExtendedSlide):
@@ -79,24 +66,10 @@ class ThirdPage(ExtendedSlide):
             )
 
 
-class MemberOnboardingDeck:
+class MemberOnboardingDeck(Deck):
     """
     A class to fill all the slides of a template PowerPoint presentation.
     """
-
-    def __init__(self, infos: MemberInfo, language: str, template_path: Path):
-        self._template_path = Presentation(str(template_path))
-        self._infos = infos
-        self._language = language
-
-        assert language in ("fr", "en"), f"Unsupported language '{language}'"
-
-        # cached properties
-        self._slides = None
-
-    def get_layout(self, name: str):
-        layouts = {layout.name: layout for layout in self._template_path.slide_layouts}
-        return layouts[name]
 
     @property
     def slides(self) -> List[ExtendedSlide]:
@@ -135,23 +108,3 @@ class MemberOnboardingDeck:
             self._slides = slide_list
 
         return self._slides
-
-    def save(self, file_path: Path = None):
-        """
-        Save in the current directory.
-        """
-
-        # if there is already a file in there, remove it
-        if file_path.exists():
-            file_path.unlink()
-
-        # if the folder doesn't exist, create it
-        if not file_path.parent.exists():
-            file_path.parent.mkdir(exist_ok=True, parents=True, mode=0o770)
-
-        # 2 fill all the slides with numbers and images
-        for s in self.slides:
-            s.fill()
-
-        # save the underlying presentation object
-        self._template_path.save(str(file_path))
