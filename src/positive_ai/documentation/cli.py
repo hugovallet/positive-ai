@@ -69,6 +69,8 @@ def generate_one_flyer(
     member_gatherer_email,
     member_gatherer_photo_path,
 ):
+    ts = datetime.datetime.now().strftime("%Y_%m_%d")
+
     # Summarise member info from prompt
     infos = MemberInfo(
         member_name=member_name,
@@ -89,7 +91,7 @@ def generate_one_flyer(
     french_deck = MemberOnboardingDeck(
         template_path=fr_template_path, infos=infos, language="fr"
     )
-    filename = f"2024_09_Positive_AI_Flyer_{infos.member_id}_fr.pptx"
+    filename = f"{ts}_Positive_AI_Flyer_{infos.member_id}_fr.pptx"
     french_deck.save(
         file_path=Path.cwd()
         / "positive_ai-generated"
@@ -107,7 +109,7 @@ def generate_one_flyer(
     english_deck = MemberOnboardingDeck(
         template_path=en_template_path, infos=infos, language="en"
     )
-    filename = f"2024_09_Positive_AI_Flyer_{infos.member_id}_en.pptx"
+    filename = f"{ts}_Positive_AI_Flyer_{infos.member_id}_en.pptx"
     english_deck.save(
         file_path=Path.cwd()
         / "positive_ai-generated"
@@ -159,7 +161,7 @@ def generate_all_flyers(config_file_path):
     prompt=True,
 )
 def generate_community_deck(config_file_path):
-    ts = datetime.datetime.now().strftime("%Y_%m")
+    ts = datetime.datetime.now().strftime("%Y_%m_%d")
     infos = AllMembersInfo(all_members_info=read_yaml(config_file_path))
 
     # Build english deck
