@@ -11,7 +11,9 @@ from positive_ai.documentation.data_model import (
     MemberInfo,
     AllMembersInfo,
     AllCoreTeamMembersInfo,
+    BaseMemberInfo,
 )
+from positive_ai.documentation.referent_starter_pack import ReferentStarterPack
 from positive_ai.utils.click import SpecialHelpOrder
 from positive_ai.utils.io import read_yaml
 
@@ -23,47 +25,97 @@ def cli():
 
 
 @cli.command(
-    help="Generate the employee starter presentation in english and french.",
+    help="Generate the full starter pack in english and french for a new company",
+    help_priority=0,
+)
+@click.option(
+    "--member-name",
+    help="Name of the company joining Positive AI",
+    type=str,
+    prompt="Please provide the full name of the company joining Positive AI",
+)
+def generate_starter_pack(member_name):
+    ts = datetime.datetime.now().strftime("%Y_%m_%d")
+    infos = BaseMemberInfo(member_name=member_name)
+
+    # Build english deck
+    print("[+] Generating french doc...")
+    fr_template_path = SRC_DIR / "templates" / "pai_starter_pack_v2_fr.pptx"
+    fr_deck = ReferentStarterPack(
+        template_path=fr_template_path, infos=member_name, language="fr"
+    )
+    filename = f"{ts}_Positive_AI_Starter_Pack_{infos.member_id}_fr.pptx"
+    fr_deck.save(
+        file_path=Path.cwd()
+        / "positive_ai-generated"
+        / "member-specific"
+        / infos.member_id
+        / "referent-onboarding"
+        / filename
+    )
+
+    # print("[+] Generating english doc...")
+    # en_template_path = SRC_DIR / "templates" / "2024_12_PAI_starter_pack_en.pptx"
+    # english_deck = ReferentStarterPack(
+    #     template_path=en_template_path, infos=member_name, language="en"
+    # )
+    # filename = f"{ts}_Positive_AI_Starter_Pack_{infos.member_id}_en.pptx"
+    # english_deck.save(
+    #     file_path=Path.cwd()
+    #     / "positive_ai-generated"
+    #     / "non-member-specific"
+    #     / filename
+    # )
+
+    print("[+] Done.")
+
+
+@cli.command(
+    help="Generate the employee flyer in english and french for one company",
     help_priority=1,
 )
 @click.option(
     "--member-name",
     help="the name of the company joining positive AI",
     type=str,
-    prompt=True,
+    prompt="Company joining positive AI name",
 )
 @click.option(
-    "--member-logo-path", help="the path to the member's logo", type=str, prompt=True
+    "--member-logo-path",
+    help="the path to the member's logo",
+    type=str,
+    prompt="Please provide the path to the logo image of the company",
+    prompt_required=True,
 )
 @click.option(
     "--member-join-month",
     help="the month the company joined positive AI",
     type=str,
-    prompt=True,
+    prompt="Please provide the month, year the company joined positive AI",
 )
 @click.option(
     "--member-gatherer-firstname",
     help="the firstname of the company gatherer",
     type=str,
-    prompt=True,
+    prompt="Please provide the first name of the company referent",
 )
 @click.option(
     "--member-gatherer-lastname",
     help="the lastname of the company gatherer",
     type=str,
-    prompt=True,
+    prompt="Please provide the last name of the company referent",
 )
 @click.option(
     "--member-gatherer-email",
     help="the email address of the company gatherer",
     type=str,
-    prompt=True,
+    prompt="Please provide the email address of the company referent",
 )
 @click.option(
     "--member-gatherer-photo-path",
     help="the email address of the company gatherer",
     type=str,
-    prompt=False,
+    prompt="Please provide the path to the professional photo of the company referent",
 )
 def generate_one_flyer(
     member_name,
@@ -91,7 +143,7 @@ def generate_one_flyer(
     # Build french deck
     print("[+] Generating french doc...")
     fr_template_path = (
-        SRC_DIR / "templates" / "2024_09 Positive_AI_Flyer membres-template-fr.pptx"
+        SRC_DIR / "templates" / "2024_09_pai_members_flyer_template_fr.pptx"
     )
     french_deck = MemberOnboardingDeck(
         template_path=fr_template_path, infos=infos, language="fr"
@@ -109,7 +161,7 @@ def generate_one_flyer(
     # Build english deck
     print("[+] Generating english doc...")
     en_template_path = (
-        SRC_DIR / "templates" / "2024_09 Positive_AI_Flyer membres-template-en.pptx"
+        SRC_DIR / "templates" / "2024_09_pai_members_flyer_template-en.pptx"
     )
     english_deck = MemberOnboardingDeck(
         template_path=en_template_path, infos=infos, language="en"
@@ -128,7 +180,7 @@ def generate_one_flyer(
 
 
 @cli.command(
-    help="Batch generate all the employee starter presentation in english and french.",
+    help="Generate ALL the employee flyers in english and french from structured member data",
     help_priority=2,
 )
 @click.option(
@@ -156,7 +208,7 @@ def generate_all_flyers(config_file_path):
 
 
 @cli.command(
-    help="Batch generate all the employee starter presentation in english and french.",
+    help="Generate community facebook in english and french.",
     help_priority=2,
 )
 @click.option(
@@ -171,7 +223,7 @@ def generate_community_deck(config_file_path):
 
     # Build english deck
     print("[+] Generating french doc...")
-    fr_template_path = SRC_DIR / "templates" / "pai-slide-master.pptx"
+    fr_template_path = SRC_DIR / "templates" / "pai_slide_master.pptx"
     fr_deck = CommunityDeck(template_path=fr_template_path, infos=infos, language="fr")
     filename = f"{ts}_Positive_AI_Community_Deck_fr.pptx"
     fr_deck.save(
@@ -182,7 +234,7 @@ def generate_community_deck(config_file_path):
     )
 
     print("[+] Generating english doc...")
-    en_template_path = SRC_DIR / "templates" / "pai-slide-master.pptx"
+    en_template_path = SRC_DIR / "templates" / "pai_slide_master.pptx"
     english_deck = CommunityDeck(
         template_path=en_template_path, infos=infos, language="en"
     )
@@ -198,8 +250,8 @@ def generate_community_deck(config_file_path):
 
 
 @cli.command(
-    help="Batch generate all the employee starter presentation in english and french.",
-    help_priority=2,
+    help="Generate core team facebook in english and french.",
+    help_priority=3,
 )
 @click.option(
     "--config-file-path",
@@ -213,7 +265,7 @@ def generate_core_team_deck(config_file_path):
 
     # Build english deck
     print("[+] Generating french doc...")
-    fr_template_path = SRC_DIR / "templates" / "pai-slide-master.pptx"
+    fr_template_path = SRC_DIR / "templates" / "pai_slide_master.pptx"
     fr_deck = CoreTeamDeck(template_path=fr_template_path, infos=infos, language="fr")
     filename = f"{ts}_Positive_AI_Core_Team_Deck_fr.pptx"
     fr_deck.save(
@@ -224,7 +276,7 @@ def generate_core_team_deck(config_file_path):
     )
 
     print("[+] Generating english doc...")
-    en_template_path = SRC_DIR / "templates" / "pai-slide-master.pptx"
+    en_template_path = SRC_DIR / "templates" / "pai_slide_master.pptx"
     english_deck = CoreTeamDeck(
         template_path=en_template_path, infos=infos, language="en"
     )

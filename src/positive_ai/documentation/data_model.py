@@ -14,6 +14,14 @@ class CoreTeamMemberInfo(BaseModel):
     ct_member_is_board: bool
 
 
+class BaseMemberInfo(BaseModel):
+    member_name: str
+
+    @property
+    def member_id(self) -> str:
+        return self.member_name.lower().replace(" ", "_")
+
+
 class MemberInfo(BaseModel):
     member_name: str
     member_join_month: str
