@@ -4,7 +4,11 @@ from typing import List, Optional
 from pptx import Presentation
 from pydantic import BaseModel, EmailStr
 
-from positive_ai.utils.ppt import ExtendedSlide, replace_text_in_shape, insert_image_in_shape
+from positive_ai.utils.ppt import (
+    ExtendedSlide,
+    replace_text_in_shape,
+    insert_image_in_shape,
+)
 
 
 class MemberInfo(BaseModel):
@@ -39,7 +43,9 @@ class FirstPage(ExtendedSlide):
         )
         if self._member_info.member_logo_path:
             insert_image_in_shape(
-                self.get_shape("Picture Placeholder 3"), self._member_info.member_logo_path, center=True
+                self.get_shape("Picture Placeholder 3"),
+                self._member_info.member_logo_path,
+                center=True,
             )
 
 

@@ -93,8 +93,9 @@ def replace_text_in_shape(shape: Shape, new_text: str):
         raise TypeError("shape as no text box")
 
 
-def insert_image_in_shape(placeholder: Union[Shape, AnyPlaceholder],
-                          image_path: str, center: bool = False):
+def insert_image_in_shape(
+    placeholder: Union[Shape, AnyPlaceholder], image_path: str, center: bool = False
+):
     picture = placeholder.insert_picture(image_path)
 
     available_width = picture.width
@@ -129,4 +130,4 @@ def insert_image_in_shape(placeholder: Union[Shape, AnyPlaceholder],
         picture.top = picture.top + int((available_height - picture.height) / 2)
         picture.left = picture.left + int((available_width - picture.width) / 2)
 
-    #image.left = (prs.slide_width - image.width) / 2
+    # image.left = (prs.slide_width - image.width) / 2

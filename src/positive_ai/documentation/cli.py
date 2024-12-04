@@ -14,7 +14,7 @@ def cli():
 
 @cli.command(
     help="Generate the employee starter presentation in english and french.",
-    help_priority=1
+    help_priority=1,
 )
 @click.option(
     "--member-name",
@@ -76,7 +76,6 @@ def generate_one_flyer(
     )
     print(f"[+] Generating doc for member '{infos.member_name}'")
 
-
     # Build french deck
     print("[+] Generating french doc...")
     fr_template_path = (
@@ -116,7 +115,7 @@ def generate_one_flyer(
 
 @cli.command(
     help="Batch generate all the employee starter presentation in english and french.",
-    help_priority=2
+    help_priority=2,
 )
 @click.option(
     "--config-file-path",
@@ -134,7 +133,9 @@ def generate_all_flyers(config_file_path):
             for member_config in loaded:
                 try:
                     params = [p.name for p in generate_one_flyer.params]
-                    generate_one_flyer.callback(**{k: v for k, v in member_config.items() if k in params})
+                    generate_one_flyer.callback(
+                        **{k: v for k, v in member_config.items() if k in params}
+                    )
                 except Exception as e:
                     raise e
 

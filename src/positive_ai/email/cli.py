@@ -12,9 +12,6 @@ def cli():
     pass
 
 
-@cli.command(
-    help="Send a welcome message in French or English",
-    help_priority=1
-)
+@cli.command(help="Send a welcome message in French or English", help_priority=1)
 def send_welcome():
     pass

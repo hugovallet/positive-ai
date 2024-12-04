@@ -3,3 +3,4 @@ python-pptx
 typeguard
 pydantic
 email-validator
+googletrans
