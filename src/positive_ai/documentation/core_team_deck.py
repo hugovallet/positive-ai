@@ -5,7 +5,7 @@ from typing import List, Optional
 from pptx import Presentation
 from pydantic import BaseModel, EmailStr
 
-from positive_ai.documentation.data_model import MemberInfo
+from positive_ai.documentation.data_model import MemberInfo, CoreTeamMemberInfo
 from positive_ai.utils.ppt import (
     ExtendedSlide,
     replace_text_in_shape,
@@ -31,70 +31,51 @@ class FirstPage(ExtendedSlide):
         today = datetime.today().strftime("%b %d, %Y")
         replace_text_in_shape(self.get_shape("Subtitle 2"), today)
         if self._language == "fr":
-            replace_text_in_shape(self.get_shape("Title 1"), "Communauté Positive AI")
+            replace_text_in_shape(
+                self.get_shape("Title 1"),
+                "Conseil d'administration et Core Team Positive AI",
+            )
         else:
-            replace_text_in_shape(self.get_shape("Title 1"), "Positive AI Community")
+            replace_text_in_shape(
+                self.get_shape("Title 1"), "Positive AI Board and Core Team"
+            )
 
 
 class TrombiPage(ExtendedSlide):
-    def __init__(self, master_slide, infos: List[MemberInfo], language: str):
+    def __init__(self, master_slide, infos: List[CoreTeamMemberInfo], language: str):
         super().__init__(master_slide, language=language)
         self._infos = infos
 
-    def fill(self):
-        if self._language == "fr":
-            replace_text_in_shape(
-                self.get_shape("Title 1"), "Communauté PAI - Référents Entreprise"
-            )
-        else:
-            replace_text_in_shape(
-                self.get_shape("Title 1"), "PAI Community - Gatherers"
-            )
+    def set_title(self, title: str):
+        replace_text_in_shape(self.get_shape("Title 1"), title)
 
-        start_num = 2
+    def fill(self):
+        start_num = 1
         for i, member_info in enumerate(self._infos):
-            shape_num = start_num + 6 * i
-            insert_image_in_shape(
-                self.get_shape(f"Picture Placeholder {shape_num}"),
-                member_info.member_logo_path,
-                refit=True,
-                center=True,
-            )
+            shape_num = start_num + 4 * i
             insert_image_in_shape(
                 self.get_shape(f"Picture Placeholder {shape_num + 1}"),
-                member_info.member_gatherer_photo_path,
+                member_info.ct_member_photo_path,
                 refit=False,
             )
             replace_text_in_shape(
                 self.get_shape(f"Text Placeholder {shape_num + 2}"),
-                member_info.member_gatherer_firstname
-                + " "
-                + member_info.member_gatherer_lastname,
+                member_info.ct_member_firstname + " " + member_info.ct_member_lastname,
             )
             if self._language == "fr":
                 replace_text_in_shape(
                     self.get_shape(f"Text Placeholder {shape_num + 3}"),
-                    member_info.member_gatherer_title_fr,
+                    member_info.ct_member_title_fr,
                 )
             else:
                 replace_text_in_shape(
                     self.get_shape(f"Text Placeholder {shape_num + 3}"),
-                    member_info.member_gatherer_title_en,
+                    member_info.ct_member_title_en,
                 )
             replace_text_in_shape(
                 self.get_shape(f"Text Placeholder {shape_num + 4}"),
-                member_info.member_gatherer_email,
+                member_info.ct_member_email,
             )
-            if self._language == "fr":
-                replace_text_in_shape(
-                    self.get_shape(f"Text Placeholder {shape_num + 5}"),
-                    member_info.member_gatherer_desc_fr,
-                )
-            else:
-                replace_text_in_shape(
-                    self.get_shape(f"Text Placeholder {shape_num + 5}"),
-                    member_info.member_gatherer_desc_en,
-                )
 
         # remove remaining placeholders
         for placeholder in self.shapes.placeholders:
@@ -103,7 +84,7 @@ class TrombiPage(ExtendedSlide):
                 sp.getparent().remove(sp)
 
 
-class CommunityDeck(Deck):
+class CoreTeamDeck(Deck):
     """
     A class to fill all the slides of a template PowerPoint presentation.
     """
@@ -124,13 +105,31 @@ class CommunityDeck(Deck):
             slide_list.append(
                 FirstPage(master, infos=self._infos, language=self._language)
             )
-            # create chunks of 4 members because trombi slide can handle only 4 members
-            for chunk in chunk_list(self._infos.all_members_info, 4):
-                layout = self.get_layout("facebook-slide-detailed")
+            board = [el for el in self._infos.all_members_info if el.ct_member_is_board]
+            # create chunks of 8 members because trombi slide can handle only 8 members
+            for chunk in chunk_list(board, 8):
+                layout = self.get_layout("facebook-slide-dense")
                 page = self._template_path.slides.add_slide(layout)
-                slide_list.append(
-                    TrombiPage(page, infos=chunk, language=self._language)
-                )
+                page = TrombiPage(page, infos=chunk, language=self._language)
+                if self._language == "fr":
+                    page.set_title("Conseil d'administration Positive AI")
+                else:
+                    page.set_title("Positive AI board")
+                slide_list.append(page)
+
+            other = [
+                el for el in self._infos.all_members_info if not el.ct_member_is_board
+            ]
+            # create chunks of 8 members because trombi slide can handle only 8 members
+            for chunk in chunk_list(other, 8):
+                layout = self.get_layout("facebook-slide-dense")
+                page = self._template_path.slides.add_slide(layout)
+                page = TrombiPage(page, infos=chunk, language=self._language)
+                if self._language == "fr":
+                    page.set_title("Core Team Positive AI")
+                else:
+                    page.set_title("Positive AI Core Team")
+                slide_list.append(page)
 
             self._slides = slide_list
 

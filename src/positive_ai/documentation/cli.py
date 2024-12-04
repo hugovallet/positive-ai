@@ -4,9 +4,14 @@ import click
 import yaml
 
 from positive_ai.constants import SRC_DIR
+from positive_ai.documentation.core_team_deck import CoreTeamDeck
 from positive_ai.documentation.employee_flyer import MemberOnboardingDeck
 from positive_ai.documentation.community_deck import CommunityDeck
-from positive_ai.documentation.data_model import MemberInfo, AllMembersInfo
+from positive_ai.documentation.data_model import (
+    MemberInfo,
+    AllMembersInfo,
+    AllCoreTeamMembersInfo,
+)
 from positive_ai.utils.click import SpecialHelpOrder
 from positive_ai.utils.io import read_yaml
 
@@ -166,12 +171,8 @@ def generate_community_deck(config_file_path):
 
     # Build english deck
     print("[+] Generating french doc...")
-    fr_template_path = (
-        SRC_DIR / "templates" / "Ateliers-pai-trombinoscope-template.pptx"
-    )
-    fr_deck = CommunityDeck(
-        template_path=fr_template_path, infos=infos, language="fr"
-    )
+    fr_template_path = SRC_DIR / "templates" / "pai-slide-master.pptx"
+    fr_deck = CommunityDeck(template_path=fr_template_path, infos=infos, language="fr")
     filename = f"{ts}_Positive_AI_Community_Deck_fr.pptx"
     fr_deck.save(
         file_path=Path.cwd()
@@ -181,13 +182,53 @@ def generate_community_deck(config_file_path):
     )
 
     print("[+] Generating english doc...")
-    en_template_path = (
-        SRC_DIR / "templates" / "Ateliers-pai-trombinoscope-template.pptx"
-    )
+    en_template_path = SRC_DIR / "templates" / "pai-slide-master.pptx"
     english_deck = CommunityDeck(
         template_path=en_template_path, infos=infos, language="en"
     )
     filename = f"{ts}_Positive_AI_Community_Deck_en.pptx"
+    english_deck.save(
+        file_path=Path.cwd()
+        / "positive_ai-generated"
+        / "non-member-specific"
+        / filename
+    )
+
+    print("[+] Done.")
+
+
+@cli.command(
+    help="Batch generate all the employee starter presentation in english and french.",
+    help_priority=2,
+)
+@click.option(
+    "--config-file-path",
+    help="configuration file holding all necessary information about joining members",
+    type=str,
+    prompt=True,
+)
+def generate_core_team_deck(config_file_path):
+    ts = datetime.datetime.now().strftime("%Y_%m_%d")
+    infos = AllCoreTeamMembersInfo(all_members_info=read_yaml(config_file_path))
+
+    # Build english deck
+    print("[+] Generating french doc...")
+    fr_template_path = SRC_DIR / "templates" / "pai-slide-master.pptx"
+    fr_deck = CoreTeamDeck(template_path=fr_template_path, infos=infos, language="fr")
+    filename = f"{ts}_Positive_AI_Core_Team_Deck_fr.pptx"
+    fr_deck.save(
+        file_path=Path.cwd()
+        / "positive_ai-generated"
+        / "non-member-specific"
+        / filename
+    )
+
+    print("[+] Generating english doc...")
+    en_template_path = SRC_DIR / "templates" / "pai-slide-master.pptx"
+    english_deck = CoreTeamDeck(
+        template_path=en_template_path, infos=infos, language="en"
+    )
+    filename = f"{ts}_Positive_AI_Core_Team_Deck_en.pptx"
     english_deck.save(
         file_path=Path.cwd()
         / "positive_ai-generated"
