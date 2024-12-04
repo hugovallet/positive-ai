@@ -3,6 +3,10 @@ notebooks/
 
 # doc builds
 docs/
+positive_ai-generated/
+
+# data folder
+data/
 
 # PyCharm
 .idea/
