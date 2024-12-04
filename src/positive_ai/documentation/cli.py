@@ -2,18 +2,19 @@ from pathlib import Path
 import click
 
 from positive_ai.constants import SRC_DIR
-from positive_ai.employee_guide.presentation import MemberOnboardingDeck, MemberInfo
+from positive_ai.documentation.presentation import MemberOnboardingDeck, MemberInfo
+from positive_ai.utils.click import SpecialHelpOrder
 
 
-@click.group()
+@click.group(cls=SpecialHelpOrder)
 def cli():
-    """Generates the employee flyers in english and french"""
+    """Generates all the automatic documentation in english and french"""
     pass
 
 
 @cli.command(
     help="Generate the employee starter presentation in english and french.",
-    # help_priority=1
+    help_priority=1
 )
 @click.option(
     "--member-name",
@@ -54,7 +55,7 @@ def cli():
     type=str,
     prompt=False,
 )
-def generate(
+def generate_one_flyer(
     member_name,
     member_logo,
     member_join_month,
@@ -74,7 +75,9 @@ def generate(
         member_gatherer_photo_path=member_gatherer_photo,
     )
 
+
     # Build french deck
+    print("[+] Generating french doc...")
     fr_template_path = (
         SRC_DIR / "templates" / "2024_09 Positive_AI_Flyer membres-template-fr.pptx"
     )
@@ -91,6 +94,7 @@ def generate(
     )
 
     # Build english deck
+    print("[+] Generating english doc...")
     en_template_path = (
         SRC_DIR / "templates" / "2024_09 Positive_AI_Flyer membres-template-en.pptx"
     )
@@ -105,3 +109,19 @@ def generate(
         / "employee-onboarding"
         / filename
     )
+
+    print("[+] Done.")
+
+
+@cli.command(
+    help="Batch generate all the employee starter presentation in english and french.",
+    help_priority=2
+)
+@click.option(
+    "--config-file-path",
+    help="configuration file holding all necessary information about joining members",
+    type=str,
+    prompt=True,
+)
+def generate_all_flyers(config_file_path):
+    pass

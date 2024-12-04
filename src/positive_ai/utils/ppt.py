@@ -79,7 +79,7 @@ class ExtendedSlide(Slide):
         return f"<{self.__class__.__name__}> at {hex(id(self))}\n{content}"
 
 
-def replace_text_in_shape(shape, new_text: str):
+def replace_text_in_shape(shape: Shape, new_text: str):
     """
     Replace the text in the Python ppt shape maintaining all formatting.
     """
@@ -91,3 +91,39 @@ def replace_text_in_shape(shape, new_text: str):
             text_frame.paragraphs[0].runs[0].text = new_text
     else:
         raise TypeError("shape as no text box")
+
+
+def insert_image_in_shape(placeholder: Union[Shape, AnyPlaceholder],
+                          image_path: str, center_vertically: bool = False):
+    picture = placeholder.insert_picture(image_path)
+
+    available_width = picture.width
+    available_height = picture.height
+    image_width, image_height = picture.image.size
+    placeholder_aspect_ratio = float(available_width) / float(available_height)
+    image_aspect_ratio = float(image_width) / float(image_height)
+
+    # Get initial image placeholder left and top positions
+    pos_left, pos_top = picture.left, picture.top
+
+    picture.crop_top = 0
+    picture.crop_left = 0
+    picture.crop_bottom = 0
+    picture.crop_right = 0
+
+    # ---if the placeholder is "wider" in aspect, shrink the picture width while
+    # ---maintaining the image aspect ratio
+    if placeholder_aspect_ratio > image_aspect_ratio:
+        picture.width = int(image_aspect_ratio * available_height)
+        picture.height = available_height
+
+    # ---otherwise shrink the height
+    else:
+        picture.height = int(available_width / image_aspect_ratio)
+        picture.width = available_width
+
+    # Set the picture left and top position to the initial placeholder one
+    picture.left, picture.top = pos_left, pos_top
+
+    if center_vertically:
+        picture.top = picture.top + int(picture.height / 2)
