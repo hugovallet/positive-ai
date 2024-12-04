@@ -94,7 +94,7 @@ def replace_text_in_shape(shape: Shape, new_text: str):
 
 
 def insert_image_in_shape(placeholder: Union[Shape, AnyPlaceholder],
-                          image_path: str, center_vertically: bool = False):
+                          image_path: str, center: bool = False):
     picture = placeholder.insert_picture(image_path)
 
     available_width = picture.width
@@ -125,5 +125,8 @@ def insert_image_in_shape(placeholder: Union[Shape, AnyPlaceholder],
     # Set the picture left and top position to the initial placeholder one
     picture.left, picture.top = pos_left, pos_top
 
-    if center_vertically:
-        picture.top = picture.top + int(picture.height / 2)
+    if center:
+        picture.top = picture.top + int((available_height - picture.height) / 2)
+        picture.left = picture.left + int((available_width - picture.width) / 2)
+
+    #image.left = (prs.slide_width - image.width) / 2

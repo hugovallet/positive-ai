@@ -37,9 +37,10 @@ class FirstPage(ExtendedSlide):
         replace_text_in_shape(
             self.get_shape("Text Placeholder 2"), self._member_info.member_name
         )
-        insert_image_in_shape(
-            self.get_shape("Picture Placeholder 3"), self._member_info.member_logo_path, center_vertically=True
-        )
+        if self._member_info.member_logo_path:
+            insert_image_in_shape(
+                self.get_shape("Picture Placeholder 3"), self._member_info.member_logo_path, center=True
+            )
 
 
 class SecondPage(ExtendedSlide):
@@ -65,9 +66,11 @@ class ThirdPage(ExtendedSlide):
         else:
             raise Exception(f"Unsupported language '{self._language}'")
         replace_text_in_shape(self.get_shape("Text Placeholder 2"), combined_text)
-        self.get_shape("Picture Placeholder 1").insert_picture(
-            self._member_info.member_gatherer_photo_path
-        )
+
+        if self._member_info.member_gatherer_photo_path:
+            self.get_shape("Picture Placeholder 1").insert_picture(
+                self._member_info.member_gatherer_photo_path
+            )
 
 
 class MemberOnboardingDeck:

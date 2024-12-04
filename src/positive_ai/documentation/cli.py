@@ -66,7 +66,7 @@ def generate_one_flyer(
 ):
     # Summarise member info from prompt
     infos = MemberInfo(
-        member_name=member_name.capitalize(),
+        member_name=member_name,
         member_logo_path=member_logo,
         member_join_month=member_join_month,
         member_gatherer_firstname=member_gatherer_firstname.capitalize(),
@@ -74,6 +74,7 @@ def generate_one_flyer(
         member_gatherer_email=member_gatherer_email.lower(),
         member_gatherer_photo_path=member_gatherer_photo,
     )
+    print(f"[+] Generating doc for member '{infos.member_name}'")
 
 
     # Build french deck
@@ -124,4 +125,18 @@ def generate_one_flyer(
     prompt=True,
 )
 def generate_all_flyers(config_file_path):
-    pass
+    import yaml
+
+    print("[+] Starting batch flyer generation...")
+    with open(config_file_path) as stream:
+        try:
+            loaded = yaml.safe_load(stream)
+            for member_config in loaded:
+                try:
+                    params = [p.name for p in generate_one_flyer.params]
+                    generate_one_flyer.callback(**{k: v for k, v in member_config.items() if k in params})
+                except Exception as e:
+                    raise e
+
+        except yaml.YAMLError as exc:
+            raise exc
